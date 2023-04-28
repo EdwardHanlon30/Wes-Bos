@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body>
+
+    <form class="search-form">
+        <input type="text" class="search" placeholder="City or State">
+        <ul class="suggestions">
+            <li>Filter for a city</li>
+            <li>or a state</li>
+        </ul>
+    </form>
+    <script>
+        const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+        const cities = [];
+
+        fetch(endpoint)
+            .then(blob => blob.json())
+            .then(data => cities.push(...data));
+
+        function findMatches(wordToMatch, cities) {
+            return cities.filter(place => {
+
+                const regex = new RegExp(wordToMatch, 'gi');
+                return place.city.match(regex) || place.state.match(regex);
+            });
+        };
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        function displayMatches() {
+            const matchArray = findMatches(this.value, cities);
+            const html = matchArray.map(place => {
+                const regex = new RegExp(this.value, 'gi');
+                const cityName = place.city.replace(regex, this.value);
+                const stateName = place.state.replace(regex, this.value);
+                return `
+                    <li>
+                        <span class="name">${cityName}, ${stateName}</span>
+                        <span class="pop">${numberWithCommas(place.population)}</span>
+                    </li>
+                `;
+            }).join('');
+            suggestions.innerHTML = html;
+            searchInput.addEventListener('click', updateInput);
+            const state = document.querySelectorAll('.name');
+            for (let item in state) {
+                if (state[item]) {
+                    for (let spans in state[item]) {
+                        //state[item][spans].addEventListener('click', updateInput);
+                        console.log(state[item][spans]);
+                    }
+                    console.log(state[item][spans]);
+                }
+            }
+
+        }
+
+        //WIP
+        function updateInput(e) {
+            const inputBox = document.querySelector('.search');
+            const inputValue = document.querySelector('.search').innerHTML;
+            const clickedSuggestion = e.target.innerHTML;
+            console.log(clickedSuggestion);
+            inputBox.innerHTML = clickedSuggestion;
+            return true;
+        }
+
+        const searchInput = document.querySelector('.search');
+        const suggestions = document.querySelector('.suggestions');
+        //const state = document.querySelectorAll('.name');
+        //console.table(state);
+        //for (let item in state) console.log(state[item]);
+
+
+        searchInput.addEventListener('change', displayMatches);
+        searchInput.addEventListener('keyup', displayMatches);
+        
+
+        //state.addEventListener('click', updateInput);
+
+    </script>
+</body>
+</html>
